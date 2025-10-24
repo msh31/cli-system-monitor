@@ -13,6 +13,8 @@ int main() {
     while (true) {
         std::cout << "Process Count: " << resMon.getprocessCount() << "\n";
 
+        std::cout << "RAM Usage: " << resMon.getRamUsage() << "\n";
+
         std::this_thread::sleep_for(std::chrono::seconds(LOOP_INTERVAL));
     }
 

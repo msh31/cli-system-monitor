@@ -1,6 +1,7 @@
 #include "ResourceMonitor.hpp"
-#include <windows.h>
-#include <psapi.h>
+
+#define WIDTH 7
+#define DIV 1048576
 
 void ResourceMonitor::getJSONdata(std::string filePath) {
     std::ifstream f(filePath);
@@ -29,8 +30,22 @@ int ResourceMonitor::getCpuUsage() {
 }
 
 int ResourceMonitor::getRamUsage() {
-    //TODO
-    return 0;
+    memStatus.dwLength = sizeof(memStatus);
+    GlobalMemoryStatusEx (&memStatus);
+
+    // a bit inaccurate, but we dont care for now
+    auto availablePhysicalMemory = memStatus.ullTotalPhys - memStatus.ullAvailPhys;
+
+    // _tprintf (TEXT("There is  %*ld percent of memory in use.\n"),WIDTH, memStatus.dwMemoryLoad);
+    // _tprintf (TEXT("There are %*I64d total Mbytes of physical memory.\n"),WIDTH,memStatus.ullTotalPhys/DIV);
+    // _tprintf (TEXT("There are %*I64d free Mbytes of physical memory.\n"),WIDTH, memStatus.ullAvailPhys/DIV);
+    // _tprintf (TEXT("There are %*I64d total Mbytes of paging file.\n"),WIDTH, memStatus.ullTotalPageFile/DIV);
+    // _tprintf (TEXT("There are %*I64d free Mbytes of paging file.\n"),WIDTH, memStatus.ullAvailPageFile/DIV);
+    // _tprintf (TEXT("There are %*I64d total Mbytes of virtual memory.\n"),WIDTH, memStatus.ullTotalVirtual/DIV);
+    // _tprintf (TEXT("There are %*I64d free Mbytes of virtual memory.\n"),WIDTH, memStatus.ullAvailVirtual/DIV);
+    // _tprintf (TEXT("There are %*I64d free Mbytes of extended memory.\n"),WIDTH, memStatus.ullAvailExtendedVirtual/DIV);
+
+    return availablePhysicalMemory/DIV;
 }
 
 int ResourceMonitor::getprocessCount() {
