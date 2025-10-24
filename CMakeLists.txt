@@ -13,6 +13,4 @@ add_executable(system-monitor
     src/ResourceMonitor.cpp
 )
 
-set_target_properties(system-monitor PROPERTIES
-    WIN32_EXECUTABLE TRUE
-)
+target_link_libraries(system-monitor psapi)
