@@ -1,6 +1,10 @@
+// CPU threshold = total cpu percentage
+// RAM threshold = max ram usage in GB
+// Process threshold = max amount of processes that can run at a given time
+
 {
   "CPU_THRESHOLD": 90,
   "CPU_MAXTEMP": 80,
-  "RAM_THRESHOLD": 80,
+  "RAM_THRESHOLD": 8192,
   "PROCESS_THRESHOLD": 1000
 }
