@@ -1,10 +1,15 @@
 #include "ResourceMonitor.hpp"
 #include <chrono>
 #include <string>
+#include <sysinfoapi.h>
 
 #define WIDTH 7
 #define DIV 1048576 //the byte to megabyte conversion
 #define CHECK_PDH_STATUS(s) if ((s) != ERROR_SUCCESS) return -1; //neat lil macro, i thought they were booleans at first
+
+ResourceMonitor::ResourceMonitor() {
+    // do sum with this & a soon to be destructor
+}
 
 void ResourceMonitor::getJSONdata(std::string filePath) {
     std::ifstream f(filePath);
@@ -86,6 +91,8 @@ int ResourceMonitor::getprocessCount() {
 }
 
 void ResourceMonitor::logToConsole(std::string text) {
+    GetLocalTime(&sysTime);
+
     std::cout << "[" << sysTime.wHour << ":" << sysTime.wMinute << ":" << sysTime.wSecond << "]";
     std::cout << "ALERT: " << text << "\n";
 }

@@ -15,6 +15,7 @@ using json = nlohmann::json;
 
 class ResourceMonitor {
     public:
+        ResourceMonitor();
         void getJSONdata(std::string filePath);
         void runAnalysis();
 
@@ -23,7 +24,8 @@ class ResourceMonitor {
         int getprocessCount();
 
     private:
-        int CPU_THRESHOLD, CPU_MAXTEMP, RAM_THRESHOLD, PROCESS_THRESHOLD;
+        int CPU_MAXTEMP, RAM_THRESHOLD, PROCESS_THRESHOLD;
+        float CPU_THRESHOLD;
         MEMORYSTATUSEX memStatus;
         SYSTEMTIME sysTime;
 
