@@ -10,9 +10,7 @@ int main() {
 
     while (true) {
         //TODO: improve CPU & RAM precision
-        std::cout << "CPU Usage: " << resMon.getCpuUsage(500) << "\n";
-        std::cout << "RAM Usage: " << resMon.getRamUsage() << "\n";
-        std::cout << "Process Count: " << resMon.getprocessCount() << "\n";
+        resMon.runAnalysis();
 
         std::this_thread::sleep_for(std::chrono::seconds(LOOP_INTERVAL));
     }

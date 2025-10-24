@@ -1,5 +1,6 @@
 #include "ResourceMonitor.hpp"
 #include <chrono>
+#include <string>
 
 #define WIDTH 7
 #define DIV 1048576 //the byte to megabyte conversion
@@ -23,7 +24,7 @@ void ResourceMonitor::getJSONdata(std::string filePath) {
     std::cout << "CPU Threshold: " << CPU_THRESHOLD << "\n";
     std::cout << "CPU Max temp: " << CPU_MAXTEMP << "\n\n";
     std::cout << "RAM Threshold: " << RAM_THRESHOLD << "\n\n";
-    std::cout << "Process Threshold: " << PROCESS_THRESHOLD << "\n";
+    std::cout << "Process Threshold: " << PROCESS_THRESHOLD << "\n\n";
 }
 
 /**
@@ -82,4 +83,28 @@ int ResourceMonitor::getprocessCount() {
     }
 
     return bytesReturned / sizeof(DWORD);
+}
+
+void ResourceMonitor::logToConsole(std::string text) {
+    std::cout << "[" << sysTime.wHour << ":" << sysTime.wMinute << ":" << sysTime.wSecond << "]";
+    std::cout << "ALERT: " << text << "\n";
+}
+
+void ResourceMonitor::runAnalysis() {
+    //maybe not that good of a design, but whatever
+    float cpuUsage = getCpuUsage(500);
+    int ramUsage = getRamUsage(); //again, in mb like if you have 8GB, it'd be 8192 for example
+    int procCount = getprocessCount();
+
+    if (cpuUsage > CPU_THRESHOLD) {
+        logToConsole("CPU usage at: " + std::to_string(cpuUsage) + "% (threshold: " + std::to_string(CPU_THRESHOLD) + "%)");
+    }
+
+    if (ramUsage > RAM_THRESHOLD) {
+        logToConsole("RAM usage at: " + std::to_string(ramUsage) + "MB (threshold: " + std::to_string(RAM_THRESHOLD) + "MB)");
+    }
+
+    if (procCount > PROCESS_THRESHOLD) {
+        logToConsole("Process count at: " + std::to_string(procCount) + " (threshold: " + std::to_string(PROCESS_THRESHOLD) + ")");
+    }
 }
