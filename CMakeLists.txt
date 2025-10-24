@@ -13,4 +13,4 @@ add_executable(system-monitor
     src/ResourceMonitor.cpp
 )
 
-target_link_libraries(system-monitor psapi)
+target_link_libraries(system-monitor psapi pdh)

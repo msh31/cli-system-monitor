@@ -1,6 +1,4 @@
 #include <iostream>
-#include <chrono>
-#include <thread>
 
 #include "ResourceMonitor.hpp"
 
@@ -11,9 +9,10 @@ int main() {
     resMon.getJSONdata("config.json");
 
     while (true) {
-        std::cout << "Process Count: " << resMon.getprocessCount() << "\n";
-
+        //TODO: improve CPU & RAM precision
+        std::cout << "CPU Usage: " << resMon.getCpuUsage(500) << "\n";
         std::cout << "RAM Usage: " << resMon.getRamUsage() << "\n";
+        std::cout << "Process Count: " << resMon.getprocessCount() << "\n";
 
         std::this_thread::sleep_for(std::chrono::seconds(LOOP_INTERVAL));
     }

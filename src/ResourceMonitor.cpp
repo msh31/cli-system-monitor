@@ -1,7 +1,9 @@
 #include "ResourceMonitor.hpp"
+#include <chrono>
 
 #define WIDTH 7
-#define DIV 1048576
+#define DIV 1048576 //the byte to megabyte conversion
+#define CHECK_PDH_STATUS(s) if ((s) != ERROR_SUCCESS) return -1; //neat lil macro, i thought they were booleans at first
 
 void ResourceMonitor::getJSONdata(std::string filePath) {
     std::ifstream f(filePath);
@@ -24,9 +26,31 @@ void ResourceMonitor::getJSONdata(std::string filePath) {
     std::cout << "Process Threshold: " << PROCESS_THRESHOLD << "\n";
 }
 
-int ResourceMonitor::getCpuUsage() {
-    //TODO
-    return 0;
+/**
+ * @brief Gets the CPU usage using the Performance Data Helper (PDH) API.
+ *
+ * @param waitTime The time to wait (in milliseconds) before calling PdhCollectQueryData() again.
+ * @return The total percentage of CPU being used as an integer.
+ */
+float ResourceMonitor::getCpuUsage(int waitTime) {
+    PDH_HQUERY query;
+    PDH_HCOUNTER counter;
+    PDH_FMT_COUNTERVALUE counterVal;
+
+    CHECK_PDH_STATUS(PdhOpenQueryW(nullptr, 0, &query));
+
+    CHECK_PDH_STATUS(PdhAddCounterW(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter));
+
+    CHECK_PDH_STATUS(PdhCollectQueryData(query));
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(waitTime));
+
+    CHECK_PDH_STATUS(PdhCollectQueryData(query));
+
+    CHECK_PDH_STATUS(PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, nullptr, &counterVal));
+
+    PdhCloseQuery(query);
+    return counterVal.doubleValue;
 }
 
 int ResourceMonitor::getRamUsage() {
@@ -45,6 +69,7 @@ int ResourceMonitor::getRamUsage() {
     // _tprintf (TEXT("There are %*I64d free Mbytes of virtual memory.\n"),WIDTH, memStatus.ullAvailVirtual/DIV);
     // _tprintf (TEXT("There are %*I64d free Mbytes of extended memory.\n"),WIDTH, memStatus.ullAvailExtendedVirtual/DIV);
 
+    // returns in Mb
     return availablePhysicalMemory/DIV;
 }
 
