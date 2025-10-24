@@ -8,6 +8,12 @@ using json = nlohmann::json;
 
 int main() {
     std::ifstream f("config.json");
+
+    if (!f.is_open()) {
+        std::cerr << "Error: Could not open config.json\n";
+        return 1;
+    }
+
     json data = json::parse(f);
 
     int CPU_THRESHOLD = data["CPU_THRESHOLD"];
