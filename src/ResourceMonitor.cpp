@@ -70,15 +70,6 @@ int ResourceMonitor::getRamUsage() {
     // a bit inaccurate, but we dont care for now
     auto availablePhysicalMemory = memStatus.ullTotalPhys - memStatus.ullAvailPhys;
 
-    // _tprintf (TEXT("There is  %*ld percent of memory in use.\n"),WIDTH, memStatus.dwMemoryLoad);
-    // _tprintf (TEXT("There are %*I64d total Mbytes of physical memory.\n"),WIDTH,memStatus.ullTotalPhys/DIV);
-    // _tprintf (TEXT("There are %*I64d free Mbytes of physical memory.\n"),WIDTH, memStatus.ullAvailPhys/DIV);
-    // _tprintf (TEXT("There are %*I64d total Mbytes of paging file.\n"),WIDTH, memStatus.ullTotalPageFile/DIV);
-    // _tprintf (TEXT("There are %*I64d free Mbytes of paging file.\n"),WIDTH, memStatus.ullAvailPageFile/DIV);
-    // _tprintf (TEXT("There are %*I64d total Mbytes of virtual memory.\n"),WIDTH, memStatus.ullTotalVirtual/DIV);
-    // _tprintf (TEXT("There are %*I64d free Mbytes of virtual memory.\n"),WIDTH, memStatus.ullAvailVirtual/DIV);
-    // _tprintf (TEXT("There are %*I64d free Mbytes of extended memory.\n"),WIDTH, memStatus.ullAvailExtendedVirtual/DIV);
-
     // returns in Mb
     return availablePhysicalMemory/DIV;
 }
