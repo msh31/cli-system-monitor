@@ -1,5 +1,6 @@
 #include "ResourceMonitor.hpp"
 #include <chrono>
+#include <pdh.h>
 #include <string>
 #include <sysinfoapi.h>
 
@@ -36,6 +37,21 @@ void ResourceMonitor::getJSONdata(std::string filePath) {
     std::cout << "Process Threshold: " << PROCESS_THRESHOLD << "\n\n";
 }
 
+// these 2 'deleters' get called when the unique pointer dies
+auto pdhDeleter = [](PDH_HQUERY* query) {
+    //* dereferences the pointer to get the actual handle value
+    // which iis needed for this function call and others
+    if (query && *query) {
+        PdhCloseQuery(*query);
+    }
+};
+
+auto pdhCounterDeleter = [](PDH_HCOUNTER* counter) {
+    if (counter && *counter) {
+        PdhCloseQuery(*counter);
+    }
+};
+
 /**
  * @brief Gets the CPU usage using the Performance Data Helper (PDH) API.
  *
@@ -43,23 +59,23 @@ void ResourceMonitor::getJSONdata(std::string filePath) {
  * @return The total percentage of CPU being used as an integer.
  */
 float ResourceMonitor::getCpuUsage(int waitTime) {
-    PDH_HQUERY query;
-    PDH_HCOUNTER counter;
+    PDH_HQUERY rawQuery;
+    PDH_HCOUNTER rawCounter;
     PDH_FMT_COUNTERVALUE counterVal;
 
-    CHECK_PDH_STATUS(PdhOpenQueryW(nullptr, 0, &query));
+    //wrap the qquery handle & counter for pdh to a smart pointer (unique in this case)
+    std::unique_ptr<PDH_HQUERY, decltype(pdhDeleter)> query(&rawQuery, pdhDeleter);
+    std::unique_ptr<PDH_HCOUNTER, decltype(pdhCounterDeleter)> counter(&rawCounter, pdhCounterDeleter);
 
-    CHECK_PDH_STATUS(PdhAddCounterW(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter));
+    CHECK_PDH_STATUS(PdhOpenQueryW(nullptr, 0, query.get()));
 
-    CHECK_PDH_STATUS(PdhCollectQueryData(query));
+    CHECK_PDH_STATUS(PdhAddCounterW(*query, L"\\Processor(_Total)\\% Processor Time", 0, query.get()));
 
+    CHECK_PDH_STATUS(PdhCollectQueryData(*query));
     std::this_thread::sleep_for(std::chrono::milliseconds(waitTime));
+    CHECK_PDH_STATUS(PdhCollectQueryData(*query));
 
-    CHECK_PDH_STATUS(PdhCollectQueryData(query));
-
-    CHECK_PDH_STATUS(PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, nullptr, &counterVal));
-
-    PdhCloseQuery(query);
+    CHECK_PDH_STATUS(PdhGetFormattedCounterValue(*counter, PDH_FMT_DOUBLE, nullptr, &counterVal));
     return counterVal.doubleValue;
 }
 

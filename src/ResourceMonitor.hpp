@@ -4,6 +4,7 @@
 #include <chrono>
 #include <thread>
 #include <sstream>
+#include <memory>
 
 #include <windows.h>
 #include <psapi.h>
