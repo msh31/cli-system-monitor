@@ -1,4 +1,5 @@
 #pragma once
+#include <exception>
 #include <iostream>
 #include <fstream>
 #include <chrono>
@@ -37,4 +38,18 @@ class ResourceMonitor {
         std::string logFilePath = "alerts.log";
 
         void logAlert(std::string text);
+};
+
+class ExceptionHandler : public std::exception {
+    private:
+        std::string _message;
+
+    public:
+        ExceptionHandler(const std::string& message) {
+            _message = message;
+        }
+
+        const char* what() const override {
+            return _message.c_str();
+        }
 };

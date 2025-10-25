@@ -22,8 +22,7 @@ void ResourceMonitor::getJSONdata(std::string filePath) {
     std::ifstream f(filePath);
 
     if (!f.is_open()) {
-        std::cerr << "Error: Could not open config.json\n";
-        exit(1);
+        throw ExceptionHandler("Could not open config.json");
     }
 
     json data = json::parse(f);

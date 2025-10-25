@@ -6,7 +6,13 @@
 
 int main() {
     ResourceMonitor resMon;
-    resMon.getJSONdata("config.json");
+        try {
+            resMon.getJSONdata("config.json");
+        }
+        catch (const ExceptionHandler& ex) {
+            std::cerr << "Error: " << ex.what() << "\n";
+            return 1;
+        }
 
     while (true) {
         //TODO: improve CPU & RAM precision
