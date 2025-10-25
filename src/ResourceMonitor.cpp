@@ -48,7 +48,7 @@ auto pdhDeleter = [](PDH_HQUERY* query) {
 
 auto pdhCounterDeleter = [](PDH_HCOUNTER* counter) {
     if (counter && *counter) {
-        PdhCloseQuery(*counter);
+        PdhRemoveCounter(*counter);
     }
 };
 
