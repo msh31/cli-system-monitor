@@ -8,7 +8,13 @@
 #define CHECK_PDH_STATUS(s) if ((s) != ERROR_SUCCESS) return -1; //neat lil macro, i thought they were booleans at first
 
 ResourceMonitor::ResourceMonitor() {
-    // do sum with this & a soon to be destructor
+    logFile.open(logFilePath, std::ios::app);
+}
+
+ResourceMonitor::~ResourceMonitor() {
+   	if (logFile.is_open()) {
+		logFile.close();
+	}
 }
 
 void ResourceMonitor::getJSONdata(std::string filePath) {
@@ -22,12 +28,10 @@ void ResourceMonitor::getJSONdata(std::string filePath) {
     json data = json::parse(f);
 
     CPU_THRESHOLD = data["CPU_THRESHOLD"];
-    CPU_MAXTEMP = data["CPU_MAXTEMP"];
     RAM_THRESHOLD = data["RAM_THRESHOLD"];
     PROCESS_THRESHOLD = data["PROCESS_THRESHOLD"];
 
     std::cout << "CPU Threshold: " << CPU_THRESHOLD << "\n";
-    std::cout << "CPU Max temp: " << CPU_MAXTEMP << "\n\n";
     std::cout << "RAM Threshold: " << RAM_THRESHOLD << "\n\n";
     std::cout << "Process Threshold: " << PROCESS_THRESHOLD << "\n\n";
 }
@@ -90,28 +94,44 @@ int ResourceMonitor::getprocessCount() {
     return bytesReturned / sizeof(DWORD);
 }
 
-void ResourceMonitor::logToConsole(std::string text) {
+void ResourceMonitor::logAlert(std::string text) {
     GetLocalTime(&sysTime);
 
-    std::cout << "[" << sysTime.wHour << ":" << sysTime.wMinute << ":" << sysTime.wSecond << "]";
-    std::cout << "ALERT: " << text << "\n";
+    std::ostringstream oss;
+    oss << "[" << sysTime.wHour << ":" << sysTime.wMinute << ":" << sysTime.wSecond << "] "
+        << "ALERT: " << text;
+
+    std::string logMessage = oss.str();
+    std::cout << logMessage << "\n";
+
+	if (!logFile.is_open()) {
+		logFile.open(logFilePath, std::ios::app);
+
+		if (!logFile.is_open()) {
+			std::cerr << "Error: Could not open log file at " << logFilePath << ". Disabling file logging.\n";
+			return;
+		}
+	}
+
+	logFile << logMessage << "\n";
+	logFile.flush();
 }
 
 void ResourceMonitor::runAnalysis() {
     //maybe not that good of a design, but whatever
     float cpuUsage = getCpuUsage(500);
-    int ramUsage = getRamUsage(); //again, in mb like if you have 8GB, it'd be 8192 for example
+    int ramUsage = getRamUsage(); //again, in mb like if you have 8GB, it'd be 8192 for example as per teh config.json
     int procCount = getprocessCount();
 
     if (cpuUsage > CPU_THRESHOLD) {
-        logToConsole("CPU usage at: " + std::to_string(cpuUsage) + "% (threshold: " + std::to_string(CPU_THRESHOLD) + "%)");
+        logAlert("CPU usage at: " + std::to_string(cpuUsage) + "% (threshold: " + std::to_string(CPU_THRESHOLD) + "%)");
     }
 
     if (ramUsage > RAM_THRESHOLD) {
-        logToConsole("RAM usage at: " + std::to_string(ramUsage) + "MB (threshold: " + std::to_string(RAM_THRESHOLD) + "MB)");
+        logAlert("RAM usage at: " + std::to_string(ramUsage) + "MB (threshold: " + std::to_string(RAM_THRESHOLD) + "MB)");
     }
 
     if (procCount > PROCESS_THRESHOLD) {
-        logToConsole("Process count at: " + std::to_string(procCount) + " (threshold: " + std::to_string(PROCESS_THRESHOLD) + ")");
+        logAlert("Process count at: " + std::to_string(procCount) + " (threshold: " + std::to_string(PROCESS_THRESHOLD) + ")");
     }
 }

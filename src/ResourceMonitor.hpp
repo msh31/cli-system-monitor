@@ -3,6 +3,7 @@
 #include <fstream>
 #include <chrono>
 #include <thread>
+#include <sstream>
 
 #include <windows.h>
 #include <psapi.h>
@@ -16,6 +17,8 @@ using json = nlohmann::json;
 class ResourceMonitor {
     public:
         ResourceMonitor();
+        ~ResourceMonitor();
+
         void getJSONdata(std::string filePath);
         void runAnalysis();
 
@@ -29,5 +32,8 @@ class ResourceMonitor {
         MEMORYSTATUSEX memStatus;
         SYSTEMTIME sysTime;
 
-        void logToConsole(std::string text);
+        std::ofstream logFile;
+        std::string logFilePath = "alerts.log";
+
+        void logAlert(std::string text);
 };

@@ -2,7 +2,7 @@
 
 #include "ResourceMonitor.hpp"
 
-#define LOOP_INTERVAL 1
+#define LOOP_INTERVAL 2
 
 int main() {
     ResourceMonitor resMon;
