@@ -69,7 +69,7 @@ float ResourceMonitor::getCpuUsage(int waitTime) {
 
     CHECK_PDH_STATUS(PdhOpenQueryW(nullptr, 0, query.get()));
 
-    CHECK_PDH_STATUS(PdhAddCounterW(*query, L"\\Processor(_Total)\\% Processor Time", 0, query.get()));
+    CHECK_PDH_STATUS(PdhAddCounterW(*query, L"\\Processor(_Total)\\% Processor Time", 0, counter.get()));
 
     CHECK_PDH_STATUS(PdhCollectQueryData(*query));
     std::this_thread::sleep_for(std::chrono::milliseconds(waitTime));
