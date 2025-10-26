@@ -6,6 +6,7 @@
 #include <thread>
 #include <sstream>
 #include <memory>
+#include <vector>
 
 #include <windows.h>
 #include <psapi.h>
@@ -23,6 +24,7 @@ class ResourceMonitor {
 
         void getJSONdata(std::string filePath);
         void runAnalysis();
+        void readHistory();
 
         float getCpuUsage(int waitTime);
         int getRamUsage();
@@ -36,6 +38,10 @@ class ResourceMonitor {
 
         std::ofstream logFile;
         std::string logFilePath = "alerts.log";
+
+        std::vector<float> cpuHistory;
+        std::vector<int> ramHistory;
+        std::vector<int> procHistory;
 
         void logAlert(std::string text);
 };

@@ -148,16 +148,62 @@ void ResourceMonitor::runAnalysis() {
         //vague
     }
 
+    if (cpuUsage != -1) {
+        if(cpuHistory.size() >= 10) {
+            cpuHistory.erase(cpuHistory.begin(), cpuHistory.end());
+        }
+        cpuHistory.emplace_back(cpuUsage);
 
-    if (cpuUsage != -1 && cpuUsage > CPU_THRESHOLD) {
-        logAlert("CPU usage at: " + std::to_string(cpuUsage) + "% (threshold: " + std::to_string(CPU_THRESHOLD) + "%)");
+        if (cpuUsage > CPU_THRESHOLD) {
+            logAlert("CPU usage at: " + std::to_string(cpuUsage) + "% (threshold: " + std::to_string(CPU_THRESHOLD) + "%)");
+        }
     }
 
-    if (ramUsage != -1 && ramUsage > RAM_THRESHOLD) {
-        logAlert("RAM usage at: " + std::to_string(ramUsage) + "MB (threshold: " + std::to_string(RAM_THRESHOLD) + "MB)");
+    if (ramUsage != -1) {
+        if(ramHistory.size() >= 10) {
+            ramHistory.erase(ramHistory.begin(), ramHistory.end());
+        }
+        ramHistory.emplace_back(ramUsage);
+
+        if (ramUsage > RAM_THRESHOLD) {
+            logAlert("RAM usage at: " + std::to_string(ramUsage) + "MB (threshold: " + std::to_string(RAM_THRESHOLD) + "MB)");
+        }
     }
 
-    if (procCount != -1 && procCount > PROCESS_THRESHOLD) {
-        logAlert("Process count at: " + std::to_string(procCount) + " (threshold: " + std::to_string(PROCESS_THRESHOLD) + ")");
+    if (procCount != -1) {
+        if(procHistory.size() >= 10) {
+            procHistory.erase(procHistory.begin(), procHistory.end());
+        }
+        procHistory.emplace_back(procCount);
+
+        if (procCount > PROCESS_THRESHOLD) {
+            logAlert("Process count at: " + std::to_string(procCount) + " (threshold: " + std::to_string(PROCESS_THRESHOLD) + ")");
+        }
+    }
+}
+
+void ResourceMonitor::readHistory() {
+    if(cpuHistory.size() == 10) {
+        std::cout << "\n===CPU HISTORY===";
+        for(const float& value : cpuHistory) {
+            std::cout << value << "\n";
+        }
+        std::cout << "\n\n";
+    }
+
+    if(ramHistory.size() == 10) {
+        std::cout << "\n===RAAM HISTORY===";
+        for(const int& value : ramHistory) {
+            std::cout << value << "\n";
+        }
+        std::cout << "\n\n";
+    }
+
+    if(procHistory.size() == 10) {
+        std::cout << "\n===PROCEESS HISTORY===";
+        for(const int& value : procHistory) {
+            std::cout << value << "\n";
+        }
+        std::cout << "\n\n";
     }
 }

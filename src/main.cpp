@@ -21,5 +21,6 @@ int main() {
         std::this_thread::sleep_for(std::chrono::seconds(LOOP_INTERVAL));
     }
 
+    //resMon.readHistory(); // last 10 readings
     return 0;
 }
