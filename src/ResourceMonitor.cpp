@@ -183,27 +183,18 @@ void ResourceMonitor::runAnalysis() {
 }
 
 void ResourceMonitor::readHistory() {
-    if(cpuHistory.size() == 10) {
-        std::cout << "\n===CPU HISTORY===";
-        for(const float& value : cpuHistory) {
-            std::cout << value << "\n";
-        }
-        std::cout << "\n\n";
+    std::cout << "\n===CPU HISTORY (" << cpuHistory.size() << " readings)===\n";
+    for(const float& value : cpuHistory) {
+        std::cout << value << "\n";
     }
 
-    if(ramHistory.size() == 10) {
-        std::cout << "\n===RAAM HISTORY===";
-        for(const int& value : ramHistory) {
-            std::cout << value << "\n";
-        }
-        std::cout << "\n\n";
+    std::cout << "\n===RAM HISTORY (" << ramHistory.size() << " readings)===\n";
+    for(const int& value : ramHistory) {
+        std::cout << value << "\n";
     }
 
-    if(procHistory.size() == 10) {
-        std::cout << "\n===PROCEESS HISTORY===";
-        for(const int& value : procHistory) {
-            std::cout << value << "\n";
-        }
-        std::cout << "\n\n";
+    std::cout << "\n===PROCESS HISTORY (" << procHistory.size() << " readings)===\n";
+    for(const int& value : procHistory) {
+        std::cout << value << "\n";
     }
 }
