@@ -7,9 +7,11 @@
 #define LOOP_INTERVAL 2
 
 ResourceMonitor resMon;
+int timeRan = 0;
 
 void signalHandler(int signal) {
     resMon.readHistory(); // last 10 readings
+    std::cout << "Time (in seconds) the program has ran: " << timeRan << "\n";
     exit(signal);
 }
 
@@ -29,6 +31,7 @@ int main() {
         resMon.runAnalysis();
 
         std::this_thread::sleep_for(std::chrono::seconds(LOOP_INTERVAL));
+        timeRan++;
     }
 
     return 0;
