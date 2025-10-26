@@ -6,7 +6,7 @@
 
 #define WIDTH 7
 #define DIV 1048576 //the byte to megabyte conversion
-#define CHECK_PDH_STATUS(s) if ((s) != ERROR_SUCCESS) return -1; //neat lil macro, i thought they were booleans at first
+#define CHECK_PDH_STATUS(s) if ((s) != ERROR_SUCCESS) throw ExceptionHandler("There was an issue with the Performance Data API.");; //neat lil macro, i thought they were booleans at first
 
 ResourceMonitor::ResourceMonitor() {
     logFile.open(logFilePath, std::ios::app);
@@ -80,7 +80,9 @@ float ResourceMonitor::getCpuUsage(int waitTime) {
 
 int ResourceMonitor::getRamUsage() {
     memStatus.dwLength = sizeof(memStatus);
-    GlobalMemoryStatusEx (&memStatus);
+    if(!GlobalMemoryStatusEx (&memStatus)) {
+        throw ExceptionHandler("Failed to retrieve information about the system's current usage of both physical and virtual memory.");
+    }
 
     // a bit inaccurate, but we dont care for now
     auto availablePhysicalMemory = memStatus.ullTotalPhys - memStatus.ullAvailPhys;
@@ -94,7 +96,7 @@ int ResourceMonitor::getprocessCount() {
     DWORD bytesReturned;
 
     if (!EnumProcesses(processIDs, sizeof(processIDs), &bytesReturned)) {
-        return -1;
+        throw ExceptionHandler("Could not enumurate through processes to get the current count.");
     }
 
     return bytesReturned / sizeof(DWORD);
@@ -114,8 +116,7 @@ void ResourceMonitor::logAlert(std::string text) {
 		logFile.open(logFilePath, std::ios::app);
 
 		if (!logFile.is_open()) {
-			std::cerr << "Error: Could not open log file at " << logFilePath << ". Disabling file logging.\n";
-			return;
+		    throw ExceptionHandler("Error: Could not open log file at " + logFilePath + "\n");
 		}
 	}
 
@@ -124,20 +125,39 @@ void ResourceMonitor::logAlert(std::string text) {
 }
 
 void ResourceMonitor::runAnalysis() {
-    //maybe not that good of a design, but whatever
-    float cpuUsage = getCpuUsage(500);
-    int ramUsage = getRamUsage(); //again, in mb like if you have 8GB, it'd be 8192 for example as per teh config.json
-    int procCount = getprocessCount();
+    float cpuUsage = -1;
+    int ramUsage = -1;
+    int procCount = -1;
 
-    if (cpuUsage > CPU_THRESHOLD) {
+    try {
+        cpuUsage = getCpuUsage(500);
+    } catch (const ExceptionHandler& ex) {
+        std::cerr << "CPU monitoring failed: " << ex.what() << "\n";
+    }
+
+    try {
+        ramUsage = getRamUsage();
+    } catch (const ExceptionHandler& ex) {
+        std::cerr << "RAM monitoring failed: " << ex.what() << "\n";
+    }
+
+    try {
+        procCount = getprocessCount();
+    } catch (const ExceptionHandler& ex) {
+        std::cerr << "Process counting failed: " << ex.what() << "\n";
+        //vague
+    }
+
+
+    if (cpuUsage != -1 && cpuUsage > CPU_THRESHOLD) {
         logAlert("CPU usage at: " + std::to_string(cpuUsage) + "% (threshold: " + std::to_string(CPU_THRESHOLD) + "%)");
     }
 
-    if (ramUsage > RAM_THRESHOLD) {
+    if (ramUsage != -1 && ramUsage > RAM_THRESHOLD) {
         logAlert("RAM usage at: " + std::to_string(ramUsage) + "MB (threshold: " + std::to_string(RAM_THRESHOLD) + "MB)");
     }
 
-    if (procCount > PROCESS_THRESHOLD) {
+    if (procCount != -1 && procCount > PROCESS_THRESHOLD) {
         logAlert("Process count at: " + std::to_string(procCount) + " (threshold: " + std::to_string(PROCESS_THRESHOLD) + ")");
     }
 }
