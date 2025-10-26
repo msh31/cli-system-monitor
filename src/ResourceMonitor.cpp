@@ -150,7 +150,7 @@ void ResourceMonitor::runAnalysis() {
 
     if (cpuUsage != -1) {
         if(cpuHistory.size() >= 10) {
-            cpuHistory.erase(cpuHistory.begin(), cpuHistory.end());
+            cpuHistory.erase(cpuHistory.begin());
         }
         cpuHistory.emplace_back(cpuUsage);
 
@@ -161,7 +161,7 @@ void ResourceMonitor::runAnalysis() {
 
     if (ramUsage != -1) {
         if(ramHistory.size() >= 10) {
-            ramHistory.erase(ramHistory.begin(), ramHistory.end());
+            ramHistory.erase(ramHistory.begin());
         }
         ramHistory.emplace_back(ramUsage);
 
@@ -172,7 +172,7 @@ void ResourceMonitor::runAnalysis() {
 
     if (procCount != -1) {
         if(procHistory.size() >= 10) {
-            procHistory.erase(procHistory.begin(), procHistory.end());
+            procHistory.erase(procHistory.begin());
         }
         procHistory.emplace_back(procCount);
 
