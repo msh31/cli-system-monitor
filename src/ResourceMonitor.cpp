@@ -185,12 +185,12 @@ void ResourceMonitor::runAnalysis() {
 void ResourceMonitor::readHistory() {
     std::cout << "\n===CPU HISTORY (" << cpuHistory.size() << " readings)===\n";
     for(const float& value : cpuHistory) {
-        std::cout << value << "\n";
+        std::cout << value << "% \n";
     }
 
     std::cout << "\n===RAM HISTORY (" << ramHistory.size() << " readings)===\n";
     for(const int& value : ramHistory) {
-        std::cout << value << "\n";
+        std::cout << value << "MB \n";
     }
 
     std::cout << "\n===PROCESS HISTORY (" << procHistory.size() << " readings)===\n";
