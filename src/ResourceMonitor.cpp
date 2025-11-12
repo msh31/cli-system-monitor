@@ -198,3 +198,44 @@ void ResourceMonitor::readHistory() {
         std::cout << value << "\n";
     }
 }
+
+size_t ResourceMonitor::getProcessRamUsage(const std::string processName) {
+    DWORD processIDs[1024];
+    DWORD bytesReturned;
+    char currentProcessName[MAX_PATH];
+    size_t ramUsage = 0;
+    int browserCheckCounter = 0;
+
+    if (!EnumProcesses(processIDs, sizeof(processIDs), &bytesReturned)) {
+        throw ExceptionHandler("Could not enumurate through processes..");
+        return -1;
+    }
+
+    DWORD processCount = bytesReturned / sizeof(DWORD);
+
+    if (browserCheckCounter++ % 10 == 0) {
+        for (DWORD i = 0; i < processCount; i++) {
+            DWORD processID = processIDs[i];
+            HANDLE processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
+            PROCESS_MEMORY_COUNTERS_EX memCounters;
+
+            if (processHandle == NULL) {
+                continue;
+            }
+
+            if(!GetModuleBaseNameA(processHandle, NULL, currentProcessName, sizeof(currentProcessName))) {
+                continue;
+            }
+
+            if (_stricmp(currentProcessName, processName.c_str()) == 0) {
+                if (GetProcessMemoryInfo(processHandle, (PROCESS_MEMORY_COUNTERS*)&memCounters, sizeof(memCounters))) {
+                    ramUsage += memCounters.PrivateUsage;
+                }
+            }
+
+            CloseHandle(processHandle);
+        }
+    }
+
+    return ramUsage / DIV;
+}

@@ -30,6 +30,7 @@ class ResourceMonitor {
         int getRamUsage();
         int getprocessCount();
 
+        size_t getProcessRamUsage(const std::string processName); //size_t is unsigned 64bit, hella big. a normal 32bit integer would overflow
     private:
         int CPU_MAXTEMP, RAM_THRESHOLD, PROCESS_THRESHOLD;
         float CPU_THRESHOLD;
