@@ -110,7 +110,7 @@ void ResourceMonitor::logAlert(std::string text) {
         << "ALERT: " << text;
 
     std::string logMessage = oss.str();
-    std::cout << logMessage << "\n";
+    // std::cerr << logMessage << "\n";
 
 	if (!logFile.is_open()) {
 		logFile.open(logFilePath, std::ios::app);

@@ -1,3 +1,4 @@
+#include <chrono>
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
@@ -27,6 +28,16 @@ void signalHandler(int signal) {
     exit(signal);
 }
 
+std::string stripExtension(const std::string& name) {
+    size_t dot = name.rfind(".");
+
+    if (dot == std::string::npos) {
+        return name;
+    }
+
+    return name.substr(0, dot);
+}
+
 int main() {
     signal(SIGINT, signalHandler);
 
@@ -38,29 +49,36 @@ int main() {
         return 1;
     }
 
-    for (int i = 0; i < browsersToCheck.size(); i++) {
-        std::cout << browsersToCheck[i] << "'s ram usage: 0MB\n";
-    }
+    // for (const auto& browser : browsersToCheck) {
+    //     std::cout << stripExtension(browser) << "'s ram usage: 0MB\n";
+    // }
 
+    bool firstRun = true;
     while (true) {
         //TODO: improve CPU & RAM precision
         resMon.runAnalysis();
 
         // move cursor up N lines
-        std::cout << "\033[" << browsersToCheck.size() << "A";
+        if (!firstRun) {
+            std::cout << "\033[" << browsersToCheck.size() << "A";
+        }
+        firstRun = false;
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         for (const auto& browser : browsersToCheck) {
             size_t memory = 0;
 
             try {
-                memory += resMon.getProcessRamUsage(browser);
+                memory = resMon.getProcessRamUsage(browser);
             }
             catch (const ExceptionHandler& ex) {
                 std::cerr << "Error: " << ex.what() << "\n";
             }
 
-            std::cout << "\33[2K";  // clear entire line
-            std::cout << browser << "'s ram usage: " << memory << "MB\n";
+            std::string display = stripExtension(browser);
+
+            // clear line, overwrite without adding new line
+            std::cout << "\33[2K\r" << display << "'s ram usage: " << memory << "MB\n" << std::flush;
         }
 
         std::this_thread::sleep_for(std::chrono::seconds(LOOP_INTERVAL));
