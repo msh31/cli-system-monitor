@@ -18,7 +18,7 @@ std::vector<std::string> browsersToCheck = { //non existing ones will just retur
     "brave.exe",
     "vivaldi.exe",
     "waterfox.exe",
-    "librefox.exe",
+    "librewolf.exe",
     "opera.exe"
 };
 
