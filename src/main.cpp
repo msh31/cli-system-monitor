@@ -25,6 +25,7 @@ std::vector<std::string> browsersToCheck = { //non existing ones will just retur
 void signalHandler(int signal) {
     resMon.readHistory(); // last 10 readings
     std::cout << "Time (in seconds) the program has ran: " << timeRan << "\n";
+    std::cout << "Alerts can be found in: alerts.log! (timestamped)\n";
     exit(signal);
 }
 
@@ -78,7 +79,7 @@ int main() {
             std::string display = stripExtension(browser);
 
             // clear line, overwrite without adding new line
-            std::cout << "\33[2K\r" << display << "'s ram usage: " << memory << "MB\n" << std::flush;
+            std::cout << "\33[2K\r" << display << " :" << memory << "MB\n" << std::flush;
         }
 
         std::this_thread::sleep_for(std::chrono::seconds(LOOP_INTERVAL));
